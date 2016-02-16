@@ -1,28 +1,32 @@
 package net.sf.jabref.logic.io;
 
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.io.IOException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class MimeTypeDetector {
+
     private static final Log LOGGER = LogFactory.getLog(MimeTypeDetector.class);
+
 
     public static boolean isPdfContentType(String url) {
         String contentType = getMimeType(url);
 
-        return contentType != null && contentType.toLowerCase().startsWith("application/pdf");
+        return (contentType != null) && contentType.toLowerCase().startsWith("application/pdf");
     }
 
     public static String getMimeType(String url) {
         try {
-            String contentType = Unirest.head(url).asBinary().getHeaders().getFirst("Content-Type");
-            // HEAD and GET headers might differ, try real GET request
-            if(contentType == null) {
-                contentType = Unirest.get(url).asBinary().getHeaders().getFirst("Content-Type");
-            }
+            URL source = new URL(url);
+            URLConnection dl = source.openConnection();
+            dl.connect();
+            String contentType = dl.getContentType();
+
             return contentType;
-        } catch (UnirestException | RuntimeException e) {
+
+        } catch (IOException e) {
             LOGGER.debug("Error getting MIME type of URL", e);
             return null;
         }
