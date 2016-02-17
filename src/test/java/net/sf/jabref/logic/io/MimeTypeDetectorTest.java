@@ -4,10 +4,11 @@ import net.sf.jabref.support.DevEnvironment;
 import org.junit.Assume;
 import org.junit.Ignore;
 import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import java.io.File;
+import java.net.URI;
 
 public class MimeTypeDetectorTest {
     @Test
@@ -26,6 +27,23 @@ public class MimeTypeDetectorTest {
     public void beTrueForPdfMimeType() {
         String pdfUrl = "http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf";
         assertTrue(MimeTypeDetector.isPdfContentType(pdfUrl));
+    }
+
+    @Test
+    public void beTrueForLocalUri() {
+        try {
+            String absolutePath = new File("src/test/resources/net/sf/jabref/logic/io/empty.pdf").getAbsolutePath();
+            URI pdfUri = new URI(
+                    "file",
+                    "/",
+                    absolutePath,
+                    null);
+            System.out.println(pdfUri.toURL());
+            assertTrue(MimeTypeDetector.isPdfContentType(pdfUri.toString()));
+        }
+        catch (Exception e) {
+            
+        }
     }
 
     @Ignore
